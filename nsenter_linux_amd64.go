@@ -8,19 +8,19 @@ import (
 	"strconv"
 	"strings"
 	. "syscall"
-
 	"github.com/coreos/go-namespaces/namespace"
-	"github.com/docker/libcontainer"
-	"github.com/docker/libcontainer/namespaces"
+//        "github.com/opencontainers/runc/libcontainer"
+        "github.com/opencontainers/runc/libcontainer/configs"
+//        "github.com/opencontainers/runc/libcontainer/namespaces"
 )
 
-func loadContainer(path string) (*libcontainer.Config, error) {
+func loadContainer(path string) (*configs.Config, error) {
 	f, err := os.Open(path)
 	if err != nil {
 		return nil, err
 	}
 
-	var container *libcontainer.Config
+	var container *configs.Config
 	if err := json.NewDecoder(f).Decode(&container); err != nil {
 		f.Close()
 		return nil, err
@@ -38,12 +38,12 @@ func nsenterexec(containerName string, uid int, gid int, groups []int, wd string
 	if err != nil {
 		panic(fmt.Sprintf("Could not get PID for container: %s", containerName))
 	}
-	containerSha, err := dockersha(containerName)
+	// FIX containerSha, err := dockersha(containerName)
 	if err != nil {
 		panic(fmt.Sprintf("Could not get SHA for container: %s %s", err.Error(), containerName))
 	}
-	containerConfigLocation := fmt.Sprintf("/var/lib/docker/execdriver/native/%s/container.json", containerSha)
-	container, err := loadContainer(containerConfigLocation)
+	// FIX containerConfigLocation := fmt.Sprintf("/var/lib/docker/execdriver/native/%s/container.json", containerSha)
+	// FIX container, err := loadContainer(containerConfigLocation)
 	if err != nil {
 		panic(fmt.Sprintf("Could not load container configuration: %v", err))
 	}
@@ -95,20 +95,20 @@ func nsenterexec(containerName string, uid int, gid int, groups []int, wd string
 	if err != nil {
 		panic(err)
 	}
-	proc, err := os.FindProcess(pid)
+	// FIX proc, err := os.FindProcess(pid)
 	if err != nil {
 		panic(fmt.Sprintf("Could not get proc for pid %s", strconv.Itoa(pid)))
 	}
 	// FIXME Race condition
-	cleaner, err := namespaces.SetupCgroups(container, pid)
-	if err != nil {
-		proc.Kill()
-		proc.Wait()
-		panic(fmt.Sprintf("SetupCgroups failed: %s", err.Error()))
-	}
-	if cleaner != nil {
-		defer cleaner.Cleanup()
-	}
+	//cleaner, err := namespaces.SetupCgroups(container, pid)
+	//if err != nil {
+        //	proc.Kill()
+	//	proc.Wait()
+	//	panic(fmt.Sprintf("SetupCgroups failed: %s", err.Error()))
+	//}
+	//if cleaner != nil {
+	//	defer cleaner.Cleanup()
+	//}
 
 	var wstatus WaitStatus
 	_, err1 := Wait4(pid, &wstatus, 0, nil)

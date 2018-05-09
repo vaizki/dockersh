@@ -71,7 +71,7 @@ func dockerstart(config Configuration) (pid int, err error) {
 	if err != nil {
 		return -1, err
 	}
-	//fmt.Fprintf(os.Stderr, "docker %s\n", strings.Join(cmdtxt, " "))
+	fmt.Fprintf(os.Stderr, "docker %s\n", strings.Join(cmdtxt, " "))
 	cmd = exec.Command("docker", cmdtxt...)
 	var output bytes.Buffer
 	cmd.Stdout = &output
